@@ -1,0 +1,27 @@
+# ===== BACKEND (Spring Boot) =====
+target/
+*.log
+*.class
+*.jar
+*.war
+
+# Maven
+.mvn/
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ===== ENV FILES (IMPORTANT) =====
+.env
+application.properties
+
+# ===== FRONTEND =====
+node_modules/
+dist/

@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Grand Hotel — Reservation System</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    /* Modern Color Palette */
+    --bg-primary: #0A0E27;
+    --bg-secondary: #141A3A;
+    --bg-card: #1B2447;
+    --bg-hover: #222B54;
+    
+    --accent-primary: #6366F1;
+    --accent-secondary: #8B5CF6;
+    --accent-gradient: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+    
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    
+    --border-color: #2D3B66;
+    --border-subtle: rgba(99, 102, 241, 0.1);
+    
+    --success: #10B981;
+    --success-bg: rgba(16, 185, 129, 0.1);
+    --danger: #EF4444;
+    --danger-bg: rgba(239, 68, 68, 0.1);
+    --warning: #F59E0B;
+    --warning-bg: rgba(245, 158, 11, 0.1);
+    
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+  }
+
+  * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+  }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* Animated Background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+    animation: bgPulse 15s ease-in-out infinite alternate;
+  }
+
+  @keyframes bgPulse {
+    from { opacity: 0.5; }
+    to { opacity: 1; }
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(10, 14, 39, 0.8);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .logo-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--accent-gradient);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: var(--shadow-glow);
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .logo-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    background: linear-gradient(135deg, #fff 0%, #94A3B8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .logo-tag {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .header-btn {
+    padding: 10px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .header-btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent-primary);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+  }
+
+  .header-btn.primary {
+    background: var(--accent-gradient);
+    border-color: transparent;
+    color: white;
+    box-shadow: var(--shadow-glow);
+  }
+
+  .header-btn.primary:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 25px rgba(99, 102, 241, 0.4);
+  }
+
+  /* ── LAYOUT ── */
+  .app {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: calc(100vh - 89px);
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background: rgba(20, 26, 58, 0.5);
+    backdrop-filter: blur(10px);
+    border-right: 1px solid var(--border-color);
+    padding: 32px 0;
+    overflow-y: auto;
+  }
+
+  .sidebar-section-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 0 24px 12px;
+    font-weight: 600;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    margin: 4px 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    position: relative;
+  }
+
+  .nav-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    background: var(--accent-gradient);
+    border-radius: 0 3px 3px 0;
+    transition: height 0.3s ease;
+  }
+
+  .nav-item:hover {
+    background: var(--bg-hover);
+  }
+
+  .nav-item:hover::before {
+    height: 60%;
+  }
+
+  .nav-item.active {
+    background: rgba(99, 102, 241, 0.12);
+  }
+
+  .nav-item.active::before {
+    height: 70%;
+  }
+
+  .nav-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+  }
+
+  .nav-item.active .nav-icon,
+  .nav-item:hover .nav-icon {
+    background: var(--accent-gradient);
+    border-color: transparent;
+    box-shadow: var(--shadow-glow);
+    transform: scale(1.05);
+  }
+
+  .nav-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: color 0.3s;
+  }
+
+  .nav-item.active .nav-label,
+  .nav-item:hover .nav-label {
+    color: var(--text-primary);
+  }
+
+  .sidebar-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 20px 24px;
+    opacity: 0.5;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    padding: 48px 56px;
+    overflow-y: auto;
+    background: rgba(10, 14, 39, 0.3);
+  }
+
+  /* ── PANELS ── */
+  .panel { 
+    display: none; 
+    animation: fadeSlideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .panel.active { display: block; }
+
+  @keyframes fadeSlideUp {
+    from { 
+      opacity: 0; 
+      transform: translateY(20px); 
+    }
+    to { 
+      opacity: 1; 
+      transform: translateY(0); 
+    }
+  }
+
+  /* ── PAGE HEADING ── */
+  .page-heading {
+    margin-bottom: 40px;
+  }
+
+  .page-heading h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 0%, #94A3B8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .page-heading h1 em {
+    font-style: italic;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .page-heading p {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 600px;
+  }
+
+  .heading-line {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .heading-badge {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-primary);
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    padding: 6px 16px;
+    border-radius: 20px;
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  .heading-badge.danger {
+    color: var(--danger);
+    background: var(--danger-bg);
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+
+  .heading-line::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--border-color), transparent);
+  }
+
+  /* ── FORM CARD ── */
+  .form-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 640px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .form-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent-gradient);
+  }
+
+  .form-group {
+    margin-bottom: 24px;
+  }
+
+  label {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="tel"] {
+    width: 100%;
+    padding: 14px 18px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    background: var(--bg-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+
+  input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .btn:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  .btn span {
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn-primary {
+    background: var(--accent-gradient);
+    color: white;
+    box-shadow: var(--shadow-glow);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+  }
+
+  .btn-outline:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+  }
+
+  .btn-danger {
+    background: var(--danger);
+    color: white;
+  }
+
+  .btn-danger:hover {
+    background: #DC2626;
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  /* ── SEARCH TABS ── */
+  .search-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+    background: var(--bg-secondary);
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+  }
+
+  .search-tab {
+    flex: 1;
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .search-tab.active {
+    background: var(--accent-gradient);
+    color: white;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .search-tab:hover:not(.active) {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+
+  .search-input-group {
+    display: none;
+  }
+
+  .search-input-group.active {
+    display: block;
+  }
+
+  /* ── RESULT CARD ── */
+  .result-card {
+    display: none;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 32px;
+    margin-top: 28px;
+    box-shadow: var(--shadow-md);
+    position: relative;
+  }
+
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--accent-gradient);
+  }
+
+  .result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .result-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .result-id {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .result-badge {
+    padding: 6px 14px;
+    background: var(--success-bg);
+    color: var(--success);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .result-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .result-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .result-value {
+    font-size: 16px;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .not-found-card {
+    display: none;
+    background: var(--danger-bg);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 16px;
+    padding: 32px;
+    margin-top: 28px;
+    text-align: center;
+  }
+
+  .not-found-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  .not-found-card h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: var(--danger);
+  }
+
+  .not-found-card p {
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+
+  /* ── AVAILABILITY CARDS ── */
+  .avail-card {
+    display: none;
+    border-radius: 16px;
+    padding: 32px;
+    margin-top: 28px;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+  }
+
+  .avail-card.free {
+    background: var(--success-bg);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+
+  .avail-card.occupied {
+    background: var(--warning-bg);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .avail-icon {
+    font-size: 56px;
+    margin-bottom: 20px;
+  }
+
+  .avail-card.free .avail-icon {
+    color: var(--success);
+  }
+
+  .avail-card.occupied .avail-icon {
+    color: var(--warning);
+  }
+
+  .avail-card h3 {
+    font-size: 24px;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .avail-card.free h3 {
+    color: var(--success);
+  }
+
+  .avail-card.occupied h3 {
+    color: var(--warning);
+  }
+
+  .avail-card p {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+
+  .avail-details {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    text-align: left;
+  }
+
+  .avail-detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .avail-detail-row:last-child {
+    border-bottom: none;
+  }
+
+  .avail-detail-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .avail-detail-value {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  /* ── DANGER NOTE ── */
+  .danger-note {
+    background: var(--danger-bg);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: var(--danger);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 480px;
+    width: 90%;
+    box-shadow: var(--shadow-lg);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+  }
+
+  .modal-overlay.show .modal {
+    transform: scale(1);
+  }
+
+  .modal h3 {
+    font-size: 24px;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .modal p {
+    color: var(--text-secondary);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    padding: 16px 24px;
+    border-radius: 12px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    transform: translateX(400px);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #toast.show {
+    transform: translateX(0);
+  }
+
+  #toast.success {
+    background: var(--success);
+  }
+
+  #toast.error {
+    background: var(--danger);
+  }
+
+  /* ── SPINNER ── */
+  .spinner {
+    display: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1024px) {
+    .app {
+      grid-template-columns: 240px 1fr;
+    }
+
+    header {
+      padding: 16px 32px;
+    }
+
+    .main {
+      padding: 32px 40px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .app {
+      grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+      display: none;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .result-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .page-heading h1 {
+      font-size: 36px;
+    }
+
+    .header-actions {
+      gap: 8px;
+    }
+
+    .header-btn {
+      padding: 8px 16px;
+      font-size: 12px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🏨</div>
+    <div class="logo-text">
+      <div class="logo-name">Grand Hotel</div>
+      <div class="logo-tag">Reservation System</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="header-btn">Settings</button>
+    <button class="header-btn primary">Help</button>
+  </div>
+</header>
+
+<!-- ── APP LAYOUT ── -->
+<div class="app">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sidebar-section-label">Operations</div>
+    
+    <div class="nav-item active" onclick="switchPanel('reserve')">
+      <div class="nav-icon">➕</div>
+      <div class="nav-label">Reserve</div>
+    </div>
+
+    <div class="nav-item" onclick="switchPanel('view')">
+      <div class="nav-icon">🔍</div>
+      <div class="nav-label">View / Lookup</div>
+    </div>
+
+    <div class="nav-item" onclick="switchPanel('availability')">
+      <div class="nav-icon">📊</div>
+      <div class="nav-label">Availability</div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section-label">Management</div>
+
+    <div class="nav-item" onclick="switchPanel('update')">
+      <div class="nav-icon">✏️</div>
+      <div class="nav-label">Update</div>
+    </div>
+
+    <div class="nav-item" onclick="switchPanel('delete')">
+      <div class="nav-icon">🗑️</div>
+      <div class="nav-label">Delete</div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ── -->
+  <main class="main">
+
+    <!-- ── RESERVE PANEL ── -->
+    <div class="panel active" id="panel-reserve">
+      <div class="page-heading">
+        <h1>Reserve a <em>Room</em></h1>
+        <p>Create a new reservation for your guests with complete booking details.</p>
+        <div class="heading-line">
+          <span class="heading-badge">New Booking</span>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-group">
+          <label>Guest Name</label>
+          <input type="text" id="r-name" placeholder="Enter full name"/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Room Number</label>
+            <input type="number" id="r-room" placeholder="e.g. 101"/>
+          </div>
+          <div class="form-group">
+            <label>Contact Number</label>
+            <input type="tel" id="r-contact" placeholder="e.g. 9876543210"/>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="reserveRoom()">
+          <span>Confirm Reservation</span>
+          <div class="spinner" id="r-spinner"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── VIEW / LOOKUP PANEL ── -->
+    <div class="panel" id="panel-view">
+      <div class="page-heading">
+        <h1>View <em>Reservation</em></h1>
+        <p>Search and view existing reservations by guest name, reservation ID, or room number.</p>
+        <div class="heading-line">
+          <span class="heading-badge">Lookup</span>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="search-tabs">
+          <button class="search-tab active" onclick="setSearchTab('name', this)">By Name</button>
+          <button class="search-tab" onclick="setSearchTab('id', this)">By ID</button>
+          <button class="search-tab" onclick="setSearchTab('room', this)">By Room</button>
+        </div>
+
+        <div class="search-input-group active" id="search-by-name">
+          <div class="form-group">
+            <label>Guest Name</label>
+            <input type="text" id="v-name" placeholder="Enter guest name"/>
+          </div>
+        </div>
+
+        <div class="search-input-group" id="search-by-id">
+          <div class="form-group">
+            <label>Reservation ID</label>
+            <input type="number" id="v-id" placeholder="e.g. 5"/>
+          </div>
+        </div>
+
+        <div class="search-input-group" id="search-by-room">
+          <div class="form-group">
+            <label>Room Number</label>
+            <input type="number" id="v-room" placeholder="e.g. 204"/>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="lookupReservation()">
+          <span>Search</span>
+        </button>
+
+        <div class="result-card" id="lookup-result">
+          <div class="result-header">
+            <div>
+              <div class="result-title" id="conf-name">-</div>
+              <div class="result-id" id="conf-id">-</div>
+            </div>
+            <div class="result-badge">Confirmed</div>
+          </div>
+          <div class="result-grid">
+            <div class="result-item">
+              <div class="result-label">Room Number</div>
+              <div class="result-value" id="conf-room">-</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Contact</div>
+              <div class="result-value" id="conf-contact">-</div>
+            </div>
+            <div class="result-item" style="grid-column: 1 / -1;">
+              <div class="result-label">Booking Date</div>
+              <div class="result-value" id="conf-since">-</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="not-found-card" id="lookup-notfound">
+          <div class="not-found-icon">🔍</div>
+          <h3>No Reservation Found</h3>
+          <p>We couldn't find a reservation matching your search criteria.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── AVAILABILITY PANEL ── -->
+    <div class="panel" id="panel-availability">
+      <div class="page-heading">
+        <h1>Room <em>Availability</em></h1>
+        <p>Check the current status of any room in real-time.</p>
+        <div class="heading-line">
+          <span class="heading-badge">Live Status</span>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-group">
+          <label>Room Number</label>
+          <input type="number" id="avail-room" placeholder="e.g. 305" oninput="clearAvailResult()"/>
+        </div>
+        <button class="btn btn-primary" onclick="checkAvailability()">
+          <span>Check Status</span>
+        </button>
+
+        <div class="avail-card free" id="avail-free">
+          <div class="avail-icon">✓</div>
+          <h3>Room Available</h3>
+          <p>Room <strong id="avail-free-num">-</strong> is currently available for booking.</p>
+          <button class="btn btn-primary" onclick="goReserve()">
+            <span>Book This Room</span>
+          </button>
+        </div>
+
+        <div class="avail-card occupied" id="avail-occupied">
+          <div class="avail-icon">⚠</div>
+          <h3>Room Occupied</h3>
+          <p>This room is currently reserved. See details below:</p>
+          <div class="avail-details">
+            <div class="avail-detail-row">
+              <span class="avail-detail-label">Guest</span>
+              <span class="avail-detail-value" id="occ-guest">-</span>
+            </div>
+            <div class="avail-detail-row">
+              <span class="avail-detail-label">Reservation ID</span>
+              <span class="avail-detail-value" id="occ-id">-</span>
+            </div>
+            <div class="avail-detail-row">
+              <span class="avail-detail-label">Booked On</span>
+              <span class="avail-detail-value" id="occ-date">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── UPDATE PANEL ── -->
+    <div class="panel" id="panel-update">
+      <div class="page-heading">
+        <h1>Update <em>Reservation</em></h1>
+        <p>Modify existing reservation details and booking information.</p>
+        <div class="heading-line">
+          <span class="heading-badge">Edit Mode</span>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-group">
+          <label>Reservation ID</label>
+          <input type="number" id="u-id" placeholder="e.g. 3"/>
+        </div>
+        <div class="form-group">
+          <label>New Guest Name</label>
+          <input type="text" id="u-name" placeholder="Updated name"/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>New Room Number</label>
+            <input type="number" id="u-room" placeholder="New room"/>
+          </div>
+          <div class="form-group">
+            <label>New Contact Number</label>
+            <input type="tel" id="u-contact" placeholder="New contact"/>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="updateReservation()">
+          <span>Save Changes</span>
+          <div class="spinner" id="u-spinner"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── DELETE PANEL ── -->
+    <div class="panel" id="panel-delete">
+      <div class="page-heading">
+        <h1>Delete <em>Reservation</em></h1>
+        <p>Permanently remove a booking from the system.</p>
+        <div class="heading-line">
+          <span class="heading-badge danger">Danger Zone</span>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-group">
+          <label>Reservation ID</label>
+          <input type="number" id="d-id" placeholder="e.g. 7"/>
+        </div>
+        <div class="danger-note">
+          ⚠️ This action is permanent and cannot be undone.
+        </div>
+        <br/>
+        <button class="btn btn-danger" onclick="confirmDelete()">Delete Reservation</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <h3>Confirm Deletion</h3>
+    <p>You are about to permanently delete reservation <strong id="modal-res-id"></strong>. This cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn btn-danger" onclick="deleteReservation()">Yes, Delete</button>
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+  // ── NAVIGATION ──
+  function switchPanel(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+
+  // ── TOAST ──
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = (type === 'success' ? '✓  ' : '✕  ') + msg;
+    t.className = 'show ' + type;
+    setTimeout(() => t.className = '', 3000);
+  }
+
+  // ── MOCK DATA (replace with real API calls to your Java backend) ──
+  // let mockReservations = [
+  //   { id: 1, guest: 'Arjun Sharma',    room: 101, contact: '9876543210', date: '2025-03-10 09:14:00' },
+  //   { id: 2, guest: 'Priya Mehta',     room: 204, contact: '9123456789', date: '2025-03-11 14:30:00' },
+  //   { id: 3, guest: 'Rohit Verma',     room: 305, contact: '9988776655', date: '2025-03-12 11:00:00' },
+  // ];
+
+  // let nextId = 4;
+
+  // ── RESERVE ──
+  function reserveRoom() {
+  const name = document.getElementById('r-name').value.trim();
+  const room = document.getElementById('r-room').value.trim();
+  const contact = document.getElementById('r-contact').value.trim();
+
+  if (!name || !room || !contact) {
+    showToast('Please fill all fields.', 'error');
+    return;
+  }
+
+  fetch("http://localhost:8081/api/reservations", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      guestName: name,
+      roomNumber: parseInt(room),
+      contactNumber: contact
+    })
+  })
+  .then(res => {
+    if (!res.ok) {
+      return res.text().then(err => { throw new Error(err); });
+    }
+    return res.json();
+  })
+  .then(data => {
+    showToast("Reservation successful!");
+    
+    // clear inputs
+    document.getElementById('r-name').value = '';
+    document.getElementById('r-room').value = '';
+    document.getElementById('r-contact').value = '';
+  })
+  .catch(err => {
+    showToast(err.message, 'error');
+  });
+}
+
+  // ── VIEW / LOOKUP ──
+  let activeSearchTab = 'name';
+  function setSearchTab(tab, el) {
+  activeSearchTab = tab;
+
+  // UI highlight (optional but good)
+  document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+
+  // Show correct input
+  document.querySelectorAll('.search-input-group').forEach(g => g.style.display = 'none');
+  document.getElementById('search-by-' + tab).style.display = 'block';
+
+  // Hide results
+  document.getElementById('lookup-result').style.display = 'none';
+  document.getElementById('lookup-notfound').style.display = 'none';
+}
+  function lookupReservation() {
+
+  const resultEl   = document.getElementById('lookup-result');
+  const notFoundEl = document.getElementById('lookup-notfound');
+
+  let url = "";
+
+  // 🔹 Decide API based on tab
+  if (activeSearchTab === 'name') {
+    const name = document.getElementById('v-name').value.trim();
+    if (!name) { showToast('Enter a guest name.', 'error'); return; }
+    url = `http://localhost:8081/api/reservations/search?guestName=${name}`;
+
+  } else if (activeSearchTab === 'id') {
+    const id = document.getElementById('v-id').value;
+    if (!id) { showToast('Enter a reservation ID.', 'error'); return; }
+    url = `http://localhost:8081/api/reservations/${id}`;
+
+  } else if (activeSearchTab === 'room') {
+    const room = document.getElementById('v-room').value;
+    if (!room) { showToast('Enter a room number.', 'error'); return; }
+    url = `http://localhost:8081/api/reservations/room/${room}`;
+  }
+
+  // API CALL
+  fetch(url)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("No reservation found");
+      }
+      return res.json();
+    })
+    .then(data => {
+
+      console.log(data); // always debug first
+
+      //handle list (search by name) vs single object
+      let reservation = Array.isArray(data) ? data[0] : data;
+
+      if (!reservation) throw new Error("No reservation found");
+
+      notFoundEl.style.display = 'none';
+
+      document.getElementById('conf-name').textContent    = reservation.guestName;
+      document.getElementById('conf-id').textContent      = 'ID : ' + reservation.reservation_id;
+      document.getElementById('conf-room').textContent    = reservation.roomNumber;
+      document.getElementById('conf-contact').textContent = reservation.contactNumber;
+      document.getElementById('conf-since').textContent   = 'Booked on ' + reservation.bookingTime;
+
+      resultEl.style.display = 'block';
+    })
+    .catch(err => {
+      resultEl.style.display = 'none';
+      notFoundEl.style.display = 'block';
+      showToast(err.message, 'error');
+    });
+}
+
+  // ── ROOM AVAILABILITY ──
+  function checkAvailability() {
+    const room = parseInt(document.getElementById('avail-room').value);
+    if (!room) { showToast('Enter a room number.', 'error'); return; }
+
+    fetch(`http://localhost:8081/api/reservations/availability/${room}`)
+    .then(res => {
+      if (!res.ok) throw new Error("Error checking availability");
+      return res.text();
+    })
+    .then(async data => {
+
+      document.getElementById('avail-free').style.display = 'none';
+      document.getElementById('avail-occupied').style.display = 'none';
+
+      let status = data.trim().toUpperCase();
+      let reservation = null;
+
+      try {
+        const parsed = JSON.parse(data);
+        status = parsed.status;
+        reservation = parsed.reservation || null;
+      } catch (e) {
+        // Existing backend may return plain text: "Available" or "Occupied".
+      }
+
+      if (status === "AVAILABLE") {
+        document.getElementById('avail-free-num').textContent = room;
+        document.getElementById('avail-free').style.display = 'block';
+      } else {
+        if (!reservation) {
+          const detailRes = await fetch(`http://localhost:8081/api/reservations/room/${room}`);
+          if (detailRes.ok) {
+            reservation = await detailRes.json();
+          }
+        }
+
+        document.getElementById('occ-guest').textContent = reservation?.guestName || '-';
+        document.getElementById('occ-id').textContent = reservation?.reservation_id || '-';
+        document.getElementById('occ-date').textContent = reservation?.bookingTime || '-';
+        document.getElementById('avail-occupied').style.display = 'block';
+      }
+    })
+    .catch(err => showToast(err.message, "error"));
+  }
+
+  function clearAvailResult() {
+    document.getElementById('avail-free').style.display     = 'none';
+    document.getElementById('avail-occupied').style.display = 'none';
+  }
+
+  function goReserve() {
+    const room = document.getElementById('avail-room').value;
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.nav-item')[0].classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-reserve').classList.add('active');
+    if (room) document.getElementById('r-room').value = room;
+  }
+
+  // ── UPDATE ──
+  function updateReservation() {
+    const id      = parseInt(document.getElementById('u-id').value);
+    const name    = document.getElementById('u-name').value.trim();
+    const room    = document.getElementById('u-room').value.trim();
+    const contact = document.getElementById('u-contact').value.trim();
+
+    if (!id || !name || !room || !contact) {
+      showToast('Please fill all fields.', 'error'); return;
+    }
+
+    fetch(`http://localhost:8081/api/reservations/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      guestName: name,
+      roomNumber: parseInt(room),
+      contactNumber: contact
+    })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Update failed");
+    return res.json();
+  })
+  .then(() => {
+    showToast("Reservation updated!");
+  })
+  .catch(err => showToast(err.message, "error"));
+}
+
+  // ── DELETE ──
+  let pendingDeleteId = null;
+
+// 🔹 Step 1: Open confirmation modal
+function confirmDelete() {
+  const id = parseInt(document.getElementById('d-id').value);
+
+  if (!id) {
+    showToast('Enter a reservation ID.', 'error');
+    return;
+  }
+
+
+  pendingDeleteId = id;
+
+  document.getElementById('modal-res-id').textContent = '#' + id;
+  document.getElementById('confirm-modal').classList.add('show');
+}
+
+  function deleteReservation() {
+
+  fetch(`http://localhost:8081/api/reservations/${pendingDeleteId}`, {
+    method: "DELETE"
+  })
+  .then(res => {
+    if (!res.ok) {
+      throw new Error("Delete failed or ID not found");
+    }
+
+    closeModal();
+    document.getElementById('d-id').value = '';
+
+    showToast('Reservation #' + pendingDeleteId + ' deleted!');
+    pendingDeleteId = null;
+  })
+  .catch(err => {
+    showToast(err.message, 'error');
+  });
+}
+
+  function closeModal() {
+  document.getElementById('confirm-modal').classList.remove('show');
+}
+
+// Close modal on overlay click
+document.getElementById('confirm-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
