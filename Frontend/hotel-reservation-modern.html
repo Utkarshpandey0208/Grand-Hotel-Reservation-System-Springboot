@@ -1242,7 +1242,7 @@
     return;
   }
 
-  fetch("http://localhost:8081/api/reservations", {
+  fetch("https://grand-hotel-reservation-system-springboot.onrender.com/api/reservations", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -1300,17 +1300,17 @@
   if (activeSearchTab === 'name') {
     const name = document.getElementById('v-name').value.trim();
     if (!name) { showToast('Enter a guest name.', 'error'); return; }
-    url = `http://localhost:8081/api/reservations/search?guestName=${name}`;
+    url = `https://grand-hotel-reservation-system-springboot.onrender.com/api/reservations/search?guestName=${name}`;
 
   } else if (activeSearchTab === 'id') {
     const id = document.getElementById('v-id').value;
     if (!id) { showToast('Enter a reservation ID.', 'error'); return; }
-    url = `http://localhost:8081/api/reservations/${id}`;
+    url = `https://grand-hotel-reservation-system-springboot.onrender.com/api/reservations/${id}`;
 
   } else if (activeSearchTab === 'room') {
     const room = document.getElementById('v-room').value;
     if (!room) { showToast('Enter a room number.', 'error'); return; }
-    url = `http://localhost:8081/api/reservations/room/${room}`;
+    url = `https://grand-hotel-reservation-system-springboot.onrender.com/api/reservations/room/${room}`;
   }
 
   // API CALL
@@ -1352,7 +1352,7 @@
     const room = parseInt(document.getElementById('avail-room').value);
     if (!room) { showToast('Enter a room number.', 'error'); return; }
 
-    fetch(`http://localhost:8081/api/reservations/availability/${room}`)
+    fetch(`https://grand-hotel-reservation-system-springboot.onrender.com/api/reservations/availability/${room}`)
     .then(res => {
       if (!res.ok) throw new Error("Error checking availability");
       return res.text();
@@ -1378,7 +1378,7 @@
         document.getElementById('avail-free').style.display = 'block';
       } else {
         if (!reservation) {
-          const detailRes = await fetch(`http://localhost:8081/api/reservations/room/${room}`);
+          const detailRes = await fetch(`https://grand-hotel-reservation-system-springboot.onrender.com/api/reservations/room/${room}`);
           if (detailRes.ok) {
             reservation = await detailRes.json();
           }
@@ -1418,7 +1418,7 @@
       showToast('Please fill all fields.', 'error'); return;
     }
 
-    fetch(`http://localhost:8081/api/reservations/${id}`, {
+    fetch(`https://grand-hotel-reservation-system-springboot.onrender.com/api/reservations/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json"
@@ -1460,7 +1460,7 @@ function confirmDelete() {
 
   function deleteReservation() {
 
-  fetch(`http://localhost:8081/api/reservations/${pendingDeleteId}`, {
+  fetch(`https://grand-hotel-reservation-system-springboot.onrender.com/api/reservations/${pendingDeleteId}`, {
     method: "DELETE"
   })
   .then(res => {
