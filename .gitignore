@@ -20,7 +20,6 @@ Thumbs.db
 
 # ===== ENV FILES (IMPORTANT) =====
 .env
-application.properties
 
 # ===== FRONTEND =====
 node_modules/
