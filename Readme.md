@@ -1,7 +1,18 @@
 # 🏨 Grand Hotel Reservation System
 
-A full-stack hotel reservation system built using **Spring Boot (Backend)** and **HTML, CSS, JavaScript (Frontend)**.  
-This application allows users to create, view, search, and delete hotel reservations with a clean UI and RESTful APIs.
+<p align="center">
+  <img src="https://img.shields.io/badge/Java-17-blue?style=for-the-badge&logo=java"/>
+  <img src="https://img.shields.io/badge/SpringBoot-Backend-brightgreen?style=for-the-badge&logo=springboot"/>
+  <img src="https://img.shields.io/badge/MySQL-Database-orange?style=for-the-badge&logo=mysql"/>
+  <img src="https://img.shields.io/badge/Vercel-Frontend-black?style=for-the-badge&logo=vercel"/>
+</p>
+
+<p align="center">
+  <b>A full-stack hotel reservation system built with Spring Boot and modern web technologies.</b><br/>
+  Designed with real-world backend architecture and production deployment practices.
+  This application allows users to create, view, search, and delete hotel reservations with a clean UI and RESTful APIs.
+</p>
+
 
 ---
 
@@ -43,12 +54,6 @@ This application allows users to create, view, search, and delete hotel reservat
 - MySQL (Railway)  
 
 
-## 🎥 Demo Preview
-
-<p align="center">
-  <img src="screenshots/demo.gif" width="800"/>
-</p>
-
 ---
 
 ## 📸 Screenshots
@@ -86,6 +91,7 @@ This application allows users to create, view, search, and delete hotel reservat
 ---
 
 ## 📂 Project Structure
+```
 Frontend/
 │── index.html
 
@@ -93,7 +99,7 @@ Backend/
 │── src/main/java/com/hotelreservation/backend
 │── src/main/resources/application.properties
 │── pom.xml
-
+```
 
 ---
 
@@ -134,9 +140,9 @@ DELETE /api/reservations/{id}
 
 ### 1️⃣ Clone Repository
 
-git clone https://github.com/your-username/your-repo-name.git
+git clone https://github.com/Utkarshpandey0208/Grand-Hotel-Reservation-System-Springboot.git
 
-cd your-repo-name
+cd Grand-Hotel-Reservation-System-Springboot
 
 
 ### 2️⃣ Backend Setup
@@ -156,11 +162,13 @@ index.html
 
 ## 🔐 Environment Variables
 
-
+```
 DB_URL=your_database_url
-DB_USER=your_username
-DB_PASS=your_password
 
+DB_USER=your_username
+
+DB_PASS=your_password
+```
 
 ---
 
@@ -188,8 +196,8 @@ DB_PASS=your_password
 
 **Utkarsh Pandey**
 
-- 🎓 BSc Computer Science (3rd Year)  
-- 💻 Aspiring Backend Developer  
+- 🎓 MCA Student  
+- 💻 Exploring Backend Development  
 
 ---
 
